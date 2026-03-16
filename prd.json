@@ -24,7 +24,7 @@
         "Ctrl+C shuts down cleanly",
         "Unit tests for watcher logic exist and pass"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 3,
