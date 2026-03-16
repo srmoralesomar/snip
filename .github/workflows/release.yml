@@ -1,0 +1,91 @@
+name: Release
+
+# 1. THE TRIGGER
+# This workflow remains dormant until you push a Git tag starting with 'v'
+# Example: `git tag v1.0.0` followed by `git push origin v1.0.0`
+on:
+  push:
+    tags:
+      - 'v*'
+
+# 2. PERMISSIONS
+# By default, GitHub Actions has read-only access.
+# We must grant it 'write' access so it can create a Release page and upload files.
+permissions:
+  contents: write 
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    
+    # 3. BUILD MATRIX
+    # Instead of writing build steps 4 times, this spawns 4 separate Linux
+    # virtual machines simultaneously, one for each OS/Architecture combination.
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
+
+    steps:
+      # 4. SETUP STEPS
+      # Clones your repository into the empty virtual machine
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Downloads and installs Go so we can compile the code
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      # 5. BUILDING & PACKAGING
+      - name: Build Binary
+        env:
+          # Injects the current OS and Arch from the matrix into Go's compiler.
+          # CGO_ENABLED=0 ensures the binary is completely standalone.
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          OS_NAME="${{ matrix.goos }}"
+          ARCH_NAME="${{ matrix.goarch }}"
+          
+          # Go uses internal names (darwin, amd64). 
+          # We must map these to standard system names (Darwin, x86_64) 
+          # so our install.sh script's `uname` checks can find them.
+          if [ "$OS_NAME" = "darwin" ]; then OS_NAME="Darwin"; fi
+          if [ "$OS_NAME" = "linux" ]; then OS_NAME="Linux"; fi
+          if [ "$ARCH_NAME" = "amd64" ]; then ARCH_NAME="x86_64"; fi
+          
+          BINARY_NAME="snip"
+          
+          echo "Building ${BINARY_NAME} for ${OS_NAME} ${ARCH_NAME}..."
+          
+          # Compile the binary into a 'build' folder.
+          # -ldflags="-s -w" strips debug info, greatly reducing the file size.
+          go build -ldflags="-s -w" -o build/${BINARY_NAME} .
+
+          # 6. COMPRESSION
+          # We compress the binary into a .tar.gz archive.
+          # We do this because raw binaries can lose their "executable" file permissions 
+          # when uploaded directly to GitHub. Compressing them preserves those permissions.
+          cd build
+          ARCHIVE_NAME="snip_${OS_NAME}_${ARCH_NAME}.tar.gz"
+          tar -czvf "../${ARCHIVE_NAME}" ${BINARY_NAME}
+          cd ..
+
+      # 7. UPLOAD TO GITHUB RELEASES
+      # Takes the compressed archives from all 4 machines and attaches them 
+      # to the official GitHub Release page for this version tag.
+      # This action automatically reads the `GITHUB_REF` environment variable (e.g., refs/tags/v1.0.0)
+      # to know which version triggered the workflow. 
+      # If you pushed the tag via CLI, it creates a new release. 
+      # If you created the release via the GitHub UI, it intelligently attaches the files to that existing release.
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            snip_*.tar.gz
+          generate_release_notes: true
