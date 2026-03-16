@@ -36,7 +36,7 @@
         "Duplicate content is not stored twice in a row",
         "Unit tests for all store functions pass"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 4,

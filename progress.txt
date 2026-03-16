@@ -27,3 +27,15 @@ Files changed: go.mod, go.sum, main.go, cmd/root.go
 - 5 unit tests covering: emitting new clips, deduplication, empty-content skip, timestamp presence, shutdown on cancel — all pass.
 
 Files changed: internal/clipboard/watcher.go, internal/clipboard/system.go, internal/clipboard/watcher_test.go, cmd/daemon.go
+
+---
+
+## Task 3: BoltDB storage layer — DONE
+
+- Implemented internal/store/store.go: Store struct wrapping bbolt DB with New(path), Close, Save, List, Get, Delete, Prune, Count.
+- Save deduplicates consecutive identical entries by storing the last content hash in a "meta" bucket.
+- Keys are big-endian uint64 (bbolt NextSequence) so cursor iteration is insertion order; List reverses to return newest first.
+- DefaultPath() returns ~/.snip/history.db; New() creates parent directory with MkdirAll.
+- 16 unit tests covering all functions including edge cases (empty content, consecutive/non-consecutive dedup, prune keeps newest, zero/noop variants) — all pass.
+
+Files changed: internal/store/store.go, internal/store/store_test.go
