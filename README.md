@@ -30,8 +30,8 @@ mv snip /usr/local/bin/
 ## Quick Start
 
 ```bash
-# Start the daemon (runs in the background)
-snip daemon &
+# Start the daemon (runs in the background, suppressing output)
+snip daemon > /dev/null 2>&1 &
 
 # Copy something to your clipboard, then list history
 snip list
