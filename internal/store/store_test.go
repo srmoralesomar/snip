@@ -305,6 +305,37 @@ func TestPrune_ZeroIsNoop(t *testing.T) {
 	}
 }
 
+func TestClear(t *testing.T) {
+	s := newTestStore(t)
+
+	for i := 0; i < 5; i++ {
+		if err := s.Save(string(rune('a' + i))); err != nil {
+			t.Fatalf("Save: %v", err)
+		}
+	}
+
+	if err := s.Clear(); err != nil {
+		t.Fatalf("Clear: %v", err)
+	}
+
+	n, err := s.Count()
+	if err != nil {
+		t.Fatalf("Count after Clear: %v", err)
+	}
+	if n != 0 {
+		t.Errorf("expected 0 clips after Clear, got %d", n)
+	}
+
+	// Saving after Clear should work (dedup hash reset).
+	if err := s.Save("after-clear"); err != nil {
+		t.Fatalf("Save after Clear: %v", err)
+	}
+	clips, _ := s.List(0)
+	if len(clips) != 1 {
+		t.Errorf("expected 1 clip after save post-clear, got %d", len(clips))
+	}
+}
+
 func TestCount(t *testing.T) {
 	s := newTestStore(t)
 

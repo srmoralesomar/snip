@@ -193,6 +193,19 @@ func (s *Store) Prune(maxCount int) error {
 	})
 }
 
+// Clear deletes all clips and resets the deduplication hash.
+func (s *Store) Clear() error {
+	return s.db.Update(func(tx *bolt.Tx) error {
+		if err := tx.DeleteBucket(bucketClips); err != nil {
+			return fmt.Errorf("delete clips bucket: %w", err)
+		}
+		if _, err := tx.CreateBucket(bucketClips); err != nil {
+			return fmt.Errorf("recreate clips bucket: %w", err)
+		}
+		return tx.Bucket(bucketMeta).Delete(keyLastHash)
+	})
+}
+
 // Count returns the total number of stored clips.
 func (s *Store) Count() (int, error) {
 	var n int
