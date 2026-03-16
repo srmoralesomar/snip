@@ -75,3 +75,17 @@ Files changed: cmd/list.go, cmd/list_test.go, prd.json, progress.txt
 - Tests in cmd/copy_test.go cover out-of-range and bad-index paths; all pass.
 
 Files changed: cmd/copy.go, cmd/copy_test.go, prd.json, progress.txt
+
+---
+
+## Task 7: snip search with fuzzy matching — DONE
+
+- Implemented cmd/search.go: `snip search <query>` loads all clips, runs fuzzy.Find() against single-line previews, and displays ranked results.
+- Results are sorted by match score (fuzzy.Find returns sorted by default).
+- highlightMatches(): wraps matched character positions with ANSI bold+yellow codes, resets after each highlighted run.
+- singleLine(): strips newlines/tabs/CR for display; consistent with list.go approach, extracted as a shared helper.
+- --limit/-l flag (default 10) caps result count after fuzzy ranking.
+- Empty history and no-match cases both show friendly messages.
+- Unit tests for singleLine() and highlightMatches() in cmd/search_test.go — all pass.
+
+Files changed: cmd/search.go, cmd/search_test.go, prd.json, progress.txt

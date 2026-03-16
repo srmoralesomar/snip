@@ -85,7 +85,7 @@
         "--limit flag works",
         "No results shows a friendly message"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 8,
