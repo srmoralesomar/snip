@@ -39,3 +39,14 @@ Files changed: internal/clipboard/watcher.go, internal/clipboard/system.go, inte
 - 16 unit tests covering all functions including edge cases (empty content, consecutive/non-consecutive dedup, prune keeps newest, zero/noop variants) — all pass.
 
 Files changed: internal/store/store.go, internal/store/store_test.go
+
+---
+
+## Task 4: Wire daemon to storage — DONE
+
+- Updated cmd/daemon.go: opens BoltDB store at startup, saves each clip from the watcher channel, prunes after each save.
+- Removed stdout printing of clips; daemon runs silently (only stderr status messages on start/stop and errors).
+- Added --max-history flag (default 500) wired to store.Prune().
+- All existing tests pass; go build succeeds.
+
+Files changed: cmd/daemon.go

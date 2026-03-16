@@ -48,7 +48,7 @@
         "--max-history flag works",
         "No stdout noise during normal operation"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 5,
