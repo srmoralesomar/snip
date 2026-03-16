@@ -72,7 +72,7 @@
         "Invalid index shows a clear error",
         "Confirmation message printed to stderr"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 7,

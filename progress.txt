@@ -63,3 +63,15 @@ Files changed: cmd/daemon.go
 - Unit tests for truncate (7 cases) and relativeTime (8 cases) in cmd/list_test.go — all pass.
 
 Files changed: cmd/list.go, cmd/list_test.go, prd.json, progress.txt
+
+---
+
+## Task 6: snip copy command — DONE
+
+- Implemented cmd/copy.go: `snip copy <index>` writes the clip at the given 1-based list index back to the system clipboard; `snip copy --last` re-copies the most recent entry (index 1).
+- Invalid/non-positive index or out-of-range index produces a clear error message.
+- Confirmation (clip index + truncated preview) printed to stderr on success.
+- Reuses `truncate()` helper from list.go (same package).
+- Tests in cmd/copy_test.go cover out-of-range and bad-index paths; all pass.
+
+Files changed: cmd/copy.go, cmd/copy_test.go, prd.json, progress.txt
