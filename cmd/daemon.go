@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/omarmorales/snip/internal/clipboard"
+	"github.com/omarmorales/snip/internal/pidfile"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -64,6 +65,19 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 	if f := cmd.Flags().Lookup("storage-path"); f.Changed {
 		dbPath, _ = cmd.Flags().GetString("storage-path")
 	}
+
+	// PID file: prevent multiple daemon instances.
+	pidPath, err := pidfile.DefaultPath()
+	if err != nil {
+		return fmt.Errorf("pid file path: %w", err)
+	}
+	if pid, readErr := pidfile.Read(pidPath); readErr == nil && pidfile.IsRunning(pid) {
+		return fmt.Errorf("daemon is already running (PID %d)", pid)
+	}
+	if err := pidfile.Write(pidPath, os.Getpid()); err != nil {
+		return fmt.Errorf("write pid file: %w", err)
+	}
+	defer pidfile.Remove(pidPath) //nolint:errcheck
 
 	s, err := store.New(dbPath)
 	if err != nil {
