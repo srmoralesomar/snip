@@ -135,7 +135,7 @@
         "Commands that need the store fail gracefully with helpful messages",
         "go vet ./... passes with no warnings"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 12,

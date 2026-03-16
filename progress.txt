@@ -120,3 +120,26 @@ Files changed: internal/config/config.go, internal/config/config_test.go, cmd/co
 - Uptime derived from PID file modification time (no extra state file needed)
 
 Files changed: internal/pidfile/pidfile.go, internal/pidfile/pidfile_test.go, cmd/daemon.go, cmd/status.go, cmd/stop.go, prd.json, progress.txt
+
+---
+
+## Task 11: Polished output and error handling — DONE
+
+**Key decisions:**
+- Used github.com/fatih/color for all colored output; NoColor auto-detects non-TTY environments
+- --no-color sets color.NoColor = true via PersistentPreRun in root.go, affecting all subcommands
+- --json flag added to list and search; outputs JSON array with RFC3339 timestamps
+- highlightMatches checks color.NoColor before emitting manual ANSI codes; search_test.go forces color.NoColor=false for the highlight test
+- Graceful store errors include "Hint: run 'snip daemon'" for all user-facing commands
+- Color scheme: cyan+bold for index, yellow for timestamps, green for success, yellow for warnings, red for errors
+
+**Files changed:**
+- go.mod / go.sum: added github.com/fatih/color v1.18.0
+- cmd/root.go: --no-color flag + PersistentPreRun
+- cmd/list.go: --json flag, colored table output
+- cmd/search.go: --json flag, color.NoColor guard in highlightMatches
+- cmd/search_test.go: force color.NoColor=false for highlight test
+- cmd/copy.go, cmd/clear.go, cmd/delete.go: green success, yellow prompt
+- cmd/daemon.go: green started, yellow stopped, red errors
+- cmd/status.go: green running, yellow not running
+- cmd/stop.go: green/yellow messages
