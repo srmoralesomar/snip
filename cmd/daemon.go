@@ -84,7 +84,7 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("open history database: %w", err)
 	}
-	defer s.Close()
+	s.Close() // Close immediately; we will open it only when saving a new clip.
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -96,15 +96,25 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 	color.New(color.FgGreen).Fprintln(os.Stderr, "snip daemon started")
 
 	for clip := range watcher.Clips() {
-		if saveErr := s.Save(clip.Content); saveErr != nil {
-			color.New(color.FgRed).Fprintf(os.Stderr, "store error: %v\n", saveErr)
-			continue
-		}
-		if pruneErr := s.Prune(maxHistory); pruneErr != nil {
-			color.New(color.FgRed).Fprintf(os.Stderr, "prune error: %v\n", pruneErr)
-		}
+		saveAndPrune(dbPath, clip.Content, maxHistory)
 	}
 
 	color.New(color.FgYellow).Fprintln(os.Stderr, "snip daemon stopped")
 	return nil
+}
+
+func saveAndPrune(dbPath string, content string, maxHistory int) {
+	s, err := store.New(dbPath)
+	if err != nil {
+		color.New(color.FgRed).Fprintf(os.Stderr, "open store error: %v\n", err)
+		return
+	}
+	defer s.Close()
+
+	if saveErr := s.Save(content); saveErr != nil {
+		color.New(color.FgRed).Fprintf(os.Stderr, "store error: %v\n", saveErr)
+	}
+	if pruneErr := s.Prune(maxHistory); pruneErr != nil {
+		color.New(color.FgRed).Fprintf(os.Stderr, "prune error: %v\n", pruneErr)
+	}
 }
