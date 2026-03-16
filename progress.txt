@@ -109,3 +109,14 @@ Files changed: cmd/search.go, cmd/search_test.go, prd.json, progress.txt
 - 4 unit tests in internal/config/config_test.go: defaults, from-file, flag-overrides-file, missing-file-uses-defaults — all pass.
 
 Files changed: internal/config/config.go, internal/config/config_test.go, cmd/config_cmd.go, cmd/root.go, cmd/daemon.go, prd.json, progress.txt
+
+## Task 10: Daemon PID file and status — DONE
+
+- Created internal/pidfile/pidfile.go: Write/Read/Remove/IsRunning/StartTime helpers for ~/.snip/daemon.pid
+- Updated cmd/daemon.go: checks for existing instance (IsRunning guard), writes PID on start, removes PID file on exit via defer
+- Created cmd/status.go: `snip status` shows "daemon: running" with PID/uptime/clip-count, or "daemon: not running"; cleans up stale PID files
+- Created cmd/stop.go: `snip stop` sends SIGTERM to daemon; handles not-running and stale-PID cases gracefully
+- 7 unit tests in internal/pidfile/pidfile_test.go covering Write, Read, Remove, IsRunning, StartTime — all pass
+- Uptime derived from PID file modification time (no extra state file needed)
+
+Files changed: internal/pidfile/pidfile.go, internal/pidfile/pidfile_test.go, cmd/daemon.go, cmd/status.go, cmd/stop.go, prd.json, progress.txt
