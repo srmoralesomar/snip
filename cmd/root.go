@@ -12,9 +12,13 @@ import (
 
 var noColor bool
 
+// Version is the current release version of snip.
+const Version = "1.0.0"
+
 var rootCmd = &cobra.Command{
-	Use:   "snip",
-	Short: "snip — clipboard history manager",
+	Use:     "snip",
+	Short:   "snip — clipboard history manager",
+	Version: Version,
 	Long: `snip is a lightweight clipboard history manager.
 
 It runs a background daemon that watches your clipboard and stores
