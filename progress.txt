@@ -1,0 +1,7 @@
+# snip — Ralph Loop Progress Log
+
+## Setup
+- Project initialized with Ralph Wiggum loop
+- Tasks defined in prd.json
+
+---

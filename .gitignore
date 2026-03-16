@@ -1,0 +1,16 @@
+# Binary
+snip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Go
+vendor/
+
+# Ralph loop temp files
+*.tmp

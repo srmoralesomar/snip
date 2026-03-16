@@ -1,0 +1,11 @@
+{
+  "model": "sonnet",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(*)",
+      "Edit(./*)",
+      "Read(./*)"
+    ]
+  }
+}

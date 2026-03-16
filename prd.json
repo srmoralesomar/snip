@@ -1,0 +1,154 @@
+{
+  "project": "snip",
+  "description": "A clipboard history manager CLI written in Go. Single binary, daemon + CLI commands, local storage under ~/.snip/. Production-quality: maintainable, tested, no shortcuts.",
+  "scope": "Implement the tasks below. Each run: choose one undone task by priority (architectural and integration first, polish last); respect dependencies. Each task is done only when all acceptance criteria are satisfied. Do not skip or reinterpret criteria. Complete = all tasks have \"done\": true.",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Project scaffolding",
+      "description": "Initialize Go module, install dependencies (cobra, bbolt, clipboard, fuzzy, viper). Create main.go with cobra root command. Create cmd/ and internal/ directories. Verify `go build` works and `./snip --help` prints usage.",
+      "acceptance": [
+        "go.mod exists with all dependencies",
+        "go build produces a snip binary",
+        "./snip --help prints usage info"
+      ],
+      "done": false
+    },
+    {
+      "id": 2,
+      "title": "Clipboard watcher daemon",
+      "description": "Implement `internal/clipboard/watcher.go` — a loop that polls the system clipboard every 500ms, detects new content, and emits it via a channel. Implement `snip daemon` command that starts the watcher and prints each new clip to stdout (temporary, for testing). Handle graceful shutdown on SIGINT/SIGTERM.",
+      "acceptance": [
+        "snip daemon starts and watches clipboard",
+        "New copies are detected and printed to stdout",
+        "Ctrl+C shuts down cleanly",
+        "Unit tests for watcher logic exist and pass"
+      ],
+      "done": false
+    },
+    {
+      "id": 3,
+      "title": "BoltDB storage layer",
+      "description": "Implement `internal/store/store.go` — functions to save a clip (with timestamp, content hash to deduplicate), list clips (newest first), get a clip by ID, delete a clip, and prune clips beyond a max count. Store location: ~/.snip/history.db",
+      "acceptance": [
+        "Store creates ~/.snip/ directory if missing",
+        "Save, List, Get, Delete, Prune functions work",
+        "Duplicate content is not stored twice in a row",
+        "Unit tests for all store functions pass"
+      ],
+      "done": false
+    },
+    {
+      "id": 4,
+      "title": "Wire daemon to storage",
+      "description": "Connect the clipboard watcher to the BoltDB store. When the daemon detects a new clip, save it to the store. The daemon should now run silently in the background (remove stdout printing). Add a --max-history flag (default 500) to control how many clips are kept.",
+      "acceptance": [
+        "Daemon saves clips to BoltDB as they are copied",
+        "Old clips are pruned when max-history is exceeded",
+        "--max-history flag works",
+        "No stdout noise during normal operation"
+      ],
+      "done": false
+    },
+    {
+      "id": 5,
+      "title": "snip list command",
+      "description": "Implement `snip list` — shows the N most recent clips in a formatted table: index, timestamp (relative, like '2m ago'), and a truncated preview of the content (max 80 chars). Default N=20, configurable with --count flag.",
+      "acceptance": [
+        "snip list shows recent clips with index, time, preview",
+        "Long content is truncated with ellipsis",
+        "--count flag limits output",
+        "Empty history shows a friendly message"
+      ],
+      "done": false
+    },
+    {
+      "id": 6,
+      "title": "snip copy command",
+      "description": "Implement `snip copy <index>` — copies the clip at the given index back to the system clipboard. Also support `snip copy --last` to re-copy the most recent entry. Print confirmation to stderr.",
+      "acceptance": [
+        "snip copy 3 puts clip #3 on the clipboard",
+        "snip copy --last copies the newest clip",
+        "Invalid index shows a clear error",
+        "Confirmation message printed to stderr"
+      ],
+      "done": false
+    },
+    {
+      "id": 7,
+      "title": "snip search with fuzzy matching",
+      "description": "Implement `snip search <query>` — fuzzy-searches all stored clips and displays matching results ranked by relevance. Use github.com/sahilm/fuzzy. Highlight the matched portion in the output using ANSI colors. Add --limit flag (default 10).",
+      "acceptance": [
+        "snip search 'query' returns fuzzy-matched clips",
+        "Results are ranked by match quality",
+        "Matched characters are highlighted in output",
+        "--limit flag works",
+        "No results shows a friendly message"
+      ],
+      "done": false
+    },
+    {
+      "id": 8,
+      "title": "snip clear and snip delete commands",
+      "description": "Implement `snip clear` — deletes all history after a confirmation prompt (skip with --force). Implement `snip delete <index>` — removes a single clip by index.",
+      "acceptance": [
+        "snip clear asks for confirmation before deleting",
+        "snip clear --force skips confirmation",
+        "snip delete <index> removes one clip",
+        "Invalid index shows a clear error"
+      ],
+      "done": false
+    },
+    {
+      "id": 9,
+      "title": "Configuration file support",
+      "description": "Add config file support via viper. Location: ~/.snip/config.yaml. Supported settings: max_history (int), poll_interval_ms (int), storage_path (string). CLI flags override config file values. Implement `snip config` command that prints current config.",
+      "acceptance": [
+        "Config file is loaded from ~/.snip/config.yaml if present",
+        "CLI flags override config values",
+        "snip config prints current effective config",
+        "Missing config file uses sensible defaults",
+        "Unit tests for config loading pass"
+      ],
+      "done": false
+    },
+    {
+      "id": 10,
+      "title": "Daemon PID file and status",
+      "description": "Add PID file management to the daemon (~/.snip/daemon.pid). Prevent multiple daemon instances. Implement `snip status` — shows whether daemon is running, PID, uptime, and clip count. Implement `snip stop` — sends SIGTERM to the running daemon.",
+      "acceptance": [
+        "Only one daemon instance can run at a time",
+        "snip status shows daemon info or 'not running'",
+        "snip stop kills the daemon cleanly",
+        "PID file is cleaned up on exit"
+      ],
+      "done": false
+    },
+    {
+      "id": 11,
+      "title": "Polished output and error handling",
+      "description": "Add color output using github.com/fatih/color. Consistent error messages with exit codes. Add --no-color global flag. Add --json flag to list and search for machine-readable output. Ensure all commands fail gracefully when daemon is not running.",
+      "acceptance": [
+        "All output uses consistent color scheme",
+        "--no-color disables colors",
+        "--json outputs valid JSON for list and search",
+        "Commands that need the store fail gracefully with helpful messages",
+        "go vet ./... passes with no warnings"
+      ],
+      "done": false
+    },
+    {
+      "id": 12,
+      "title": "README and final polish",
+      "description": "Write README.md with: project description, installation instructions (go install), usage examples for every command, config file reference, and architecture overview. Add --version flag. Ensure go test coverage is above 60%.",
+      "acceptance": [
+        "README.md exists with install, usage, and config docs",
+        "snip --version prints version string",
+        "go test -cover reports > 60% coverage",
+        "go build succeeds with no warnings",
+        "go vet passes clean"
+      ],
+      "done": false
+    }
+  ]
+}
