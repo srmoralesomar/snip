@@ -13,11 +13,25 @@ A lightweight CLI clipboard history manager. Run a background daemon that silent
 
 ## Installation
 
+### 1. Quick Install (macOS / Linux)
+
+The easiest way to install `snip` without needing Go is via the install script. It automatically downloads the correct pre-compiled binary for your OS and Architecture.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/srmoralesomar/snip/main/install.sh | bash
+```
+*(Requires: `curl`, `tar`, and `sudo` access to install to `/usr/local/bin`)*
+
+### 2. Using Go (All Platforms)
+
+If you already have Go installed, you can install the latest version directly:
+
 ```bash
 go install github.com/srmoralesomar/snip@latest
 ```
+*(Requires: Go 1.20+)*
 
-Or build from source:
+### 3. Build from Source
 
 ```bash
 git clone https://github.com/srmoralesomar/snip
@@ -26,6 +40,7 @@ go build -o snip .
 # Move to a directory on your PATH, e.g.:
 mv snip /usr/local/bin/
 ```
+*(Requires: Go 1.20+, Git)*
 
 ## Quick Start
 
