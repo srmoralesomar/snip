@@ -12,7 +12,7 @@
         "go build produces a snip binary",
         "./snip --help prints usage info"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 2,

@@ -5,3 +5,14 @@
 - Tasks defined in prd.json
 
 ---
+---
+
+## Task 1: Project scaffolding — DONE
+
+- Initialized Go module: github.com/omarmorales/snip
+- Added all required dependencies: cobra, bbolt, fuzzy, clipboard, viper (and transitive deps)
+- Created main.go entry point and cmd/root.go with cobra root command
+- Created cmd/ and internal/ directories
+- Verified: go build produces snip binary, ./snip --help prints usage
+
+Files changed: go.mod, go.sum, main.go, cmd/root.go
