@@ -89,3 +89,11 @@ Files changed: cmd/copy.go, cmd/copy_test.go, prd.json, progress.txt
 - Unit tests for singleLine() and highlightMatches() in cmd/search_test.go — all pass.
 
 Files changed: cmd/search.go, cmd/search_test.go, prd.json, progress.txt
+
+## Task 8: snip clear and snip delete commands
+- Added Store.Clear() to internal/store/store.go: drops+recreates clips bucket, deletes dedup hash key
+- cmd/clear.go: snip clear with bufio confirmation prompt (reads from cmd.InOrStdin()), --force/-f flag skips it
+- cmd/delete.go: snip delete <index> — lists up to N clips, looks up by display index, deletes by internal ID
+- Tests: TestClear (store), TestClearCmd_Force, TestClearCmd_AbortOnNo, TestDeleteCmd_* (cmd package)
+- Note: had to reset clearForce=false in abort test due to cobra reusing flag state between test runs
+- Files changed: internal/store/store.go, internal/store/store_test.go, cmd/clear.go, cmd/clear_test.go, cmd/delete.go, cmd/delete_test.go

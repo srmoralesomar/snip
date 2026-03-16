@@ -97,7 +97,7 @@
         "snip delete <index> removes one clip",
         "Invalid index shows a clear error"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 9,
