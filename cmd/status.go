@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/pidfile"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
@@ -30,7 +31,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 
 	pid, err := pidfile.Read(pidPath)
 	if errors.Is(err, os.ErrNotExist) || (err == nil && !pidfile.IsRunning(pid)) {
-		fmt.Println("daemon: not running")
+		color.New(color.FgYellow).Println("daemon: not running")
 		if err == nil {
 			// Stale PID file — clean it up silently.
 			_ = pidfile.Remove(pidPath)
@@ -47,7 +48,9 @@ func runStatus(cmd *cobra.Command, args []string) error {
 		uptime = formatUptime(time.Since(startTime))
 	}
 
-	fmt.Println("daemon: running")
+	bold := color.New(color.Bold)
+	bold.Print("daemon: ")
+	color.New(color.FgGreen).Println("running")
 	fmt.Printf("  PID:    %d\n", pid)
 	fmt.Printf("  uptime: %s\n", uptime)
 

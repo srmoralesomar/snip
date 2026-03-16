@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -34,12 +35,12 @@ func runClear(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open store: %w", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
 	}
 	defer s.Close()
 
 	if !clearForce {
-		fmt.Fprint(cmd.ErrOrStderr(), "This will delete all clipboard history. Continue? [y/N] ")
+		color.New(color.FgYellow).Fprint(cmd.ErrOrStderr(), "This will delete all clipboard history. Continue? [y/N] ")
 		reader := bufio.NewReader(cmd.InOrStdin())
 		answer, _ := reader.ReadString('\n')
 		answer = strings.TrimSpace(strings.ToLower(answer))
@@ -53,6 +54,6 @@ func runClear(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("clear history: %w", err)
 	}
 
-	fmt.Fprintln(cmd.ErrOrStderr(), "Clipboard history cleared.")
+	color.New(color.FgGreen).Fprintln(cmd.ErrOrStderr(), "Clipboard history cleared.")
 	return nil
 }

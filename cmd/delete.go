@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ func runDelete(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open store: %w", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
 	}
 	defer s.Close()
 
@@ -58,6 +59,6 @@ func runDelete(cmd *cobra.Command, args []string) error {
 	}
 
 	preview := truncate(clip.Content, 60)
-	fmt.Fprintf(os.Stderr, "Deleted clip #%d: %s\n", index, preview)
+	color.New(color.FgGreen).Fprintf(os.Stderr, "Deleted clip #%d: %s\n", index, preview)
 	return nil
 }

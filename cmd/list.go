@@ -1,16 +1,21 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 	"unicode/utf8"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
 )
 
-var listCount int
+var (
+	listCount int
+	listJSON  bool
+)
 
 var listCmd = &cobra.Command{
 	Use:   "list",
@@ -24,7 +29,15 @@ Long content is truncated to 80 characters.`,
 
 func init() {
 	listCmd.Flags().IntVarP(&listCount, "count", "n", 20, "Number of clips to show")
+	listCmd.Flags().BoolVar(&listJSON, "json", false, "Output as JSON")
 	rootCmd.AddCommand(listCmd)
+}
+
+// listClipJSON is the JSON representation of a clip for list/search output.
+type listClipJSON struct {
+	Index     int    `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Content   string `json:"content"`
 }
 
 func runList(cmd *cobra.Command, args []string) error {
@@ -35,7 +48,7 @@ func runList(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open store: %w", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
 	}
 	defer s.Close()
 
@@ -45,17 +58,39 @@ func runList(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(clips) == 0 {
-		fmt.Println("No clipboard history yet. Start the daemon and copy something!")
+		color.Yellow("No clipboard history yet. Start the daemon and copy something!")
 		return nil
 	}
 
-	fmt.Printf("%-5s  %-12s  %s\n", "INDEX", "TIME", "PREVIEW")
+	if listJSON {
+		out := make([]listClipJSON, len(clips))
+		for i, clip := range clips {
+			out[i] = listClipJSON{
+				Index:     i + 1,
+				Timestamp: clip.Timestamp.UTC().Format(time.RFC3339),
+				Content:   clip.Content,
+			}
+		}
+		enc := json.NewEncoder(cmd.OutOrStdout())
+		enc.SetIndent("", "  ")
+		return enc.Encode(out)
+	}
+
+	header := color.New(color.Bold)
+	indexColor := color.New(color.FgCyan, color.Bold)
+	timeColor := color.New(color.FgYellow)
+
+	header.Printf("%-5s  %-12s  %s\n", "INDEX", "TIME", "PREVIEW")
 	fmt.Printf("%-5s  %-12s  %s\n", "-----", "------------", strings.Repeat("-", 40))
 
 	for i, clip := range clips {
 		preview := truncate(clip.Content, 80)
 		relTime := relativeTime(clip.Timestamp)
-		fmt.Printf("%-5d  %-12s  %s\n", i+1, relTime, preview)
+		fmt.Printf("%s  %s  %s\n",
+			indexColor.Sprintf("%-5d", i+1),
+			timeColor.Sprintf("%-12s", relTime),
+			preview,
+		)
 	}
 
 	return nil

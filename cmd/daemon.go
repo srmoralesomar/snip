@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/clipboard"
 	"github.com/omarmorales/snip/internal/pidfile"
 	"github.com/omarmorales/snip/internal/store"
@@ -81,7 +82,7 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open store: %w", err)
+		return fmt.Errorf("open history database: %w", err)
 	}
 	defer s.Close()
 
@@ -92,18 +93,18 @@ func runDaemon(cmd *cobra.Command, args []string) error {
 	watcher := clipboard.NewWatcher(clipboard.SystemReader{}, pollInterval)
 	go watcher.Start(ctx)
 
-	fmt.Fprintln(os.Stderr, "snip daemon started")
+	color.New(color.FgGreen).Fprintln(os.Stderr, "snip daemon started")
 
 	for clip := range watcher.Clips() {
 		if saveErr := s.Save(clip.Content); saveErr != nil {
-			fmt.Fprintf(os.Stderr, "store error: %v\n", saveErr)
+			color.New(color.FgRed).Fprintf(os.Stderr, "store error: %v\n", saveErr)
 			continue
 		}
 		if pruneErr := s.Prune(maxHistory); pruneErr != nil {
-			fmt.Fprintf(os.Stderr, "prune error: %v\n", pruneErr)
+			color.New(color.FgRed).Fprintf(os.Stderr, "prune error: %v\n", pruneErr)
 		}
 	}
 
-	fmt.Fprintln(os.Stderr, "snip daemon stopped")
+	color.New(color.FgYellow).Fprintln(os.Stderr, "snip daemon stopped")
 	return nil
 }

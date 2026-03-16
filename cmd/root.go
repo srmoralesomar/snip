@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+var noColor bool
 
 var rootCmd = &cobra.Command{
 	Use:   "snip",
@@ -17,6 +20,15 @@ var rootCmd = &cobra.Command{
 It runs a background daemon that watches your clipboard and stores
 every copied item in a local database (~/.snip/history.db).
 Use the CLI commands to search, recall, and paste any entry.`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if noColor {
+			color.NoColor = true
+		}
+	},
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "Disable color output")
 }
 
 // Execute is the entry point called from main.go.

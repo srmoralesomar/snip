@@ -3,6 +3,8 @@ package cmd
 import (
 	"strings"
 	"testing"
+
+	"github.com/fatih/color"
 )
 
 func TestSingleLine(t *testing.T) {
@@ -26,6 +28,11 @@ func TestSingleLine(t *testing.T) {
 }
 
 func TestHighlightMatches(t *testing.T) {
+	// Force color output on for this test regardless of terminal detection.
+	orig := color.NoColor
+	color.NoColor = false
+	defer func() { color.NoColor = orig }()
+
 	tests := []struct {
 		name     string
 		s        string

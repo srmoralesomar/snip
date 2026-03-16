@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/fatih/color"
 	"github.com/omarmorales/snip/internal/store"
 	"github.com/sahilm/fuzzy"
 	"github.com/spf13/cobra"
@@ -15,7 +18,10 @@ const (
 	ansiYellow = "\033[33m"
 )
 
-var searchLimit int
+var (
+	searchLimit int
+	searchJSON  bool
+)
 
 var searchCmd = &cobra.Command{
 	Use:   "search <query>",
@@ -29,7 +35,16 @@ Matched characters are highlighted in the output.`,
 
 func init() {
 	searchCmd.Flags().IntVarP(&searchLimit, "limit", "l", 10, "Maximum number of results to show")
+	searchCmd.Flags().BoolVar(&searchJSON, "json", false, "Output as JSON")
 	rootCmd.AddCommand(searchCmd)
+}
+
+// searchClipJSON is the JSON representation of a search result.
+type searchClipJSON struct {
+	Index     int    `json:"index"`
+	Timestamp string `json:"timestamp"`
+	Content   string `json:"content"`
+	Score     int    `json:"score"`
 }
 
 func runSearch(cmd *cobra.Command, args []string) error {
@@ -42,7 +57,7 @@ func runSearch(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open store: %w", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
 	}
 	defer s.Close()
 
@@ -53,7 +68,7 @@ func runSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(clips) == 0 {
-		fmt.Println("No clipboard history yet. Start the daemon and copy something!")
+		color.Yellow("No clipboard history yet. Start the daemon and copy something!")
 		return nil
 	}
 
@@ -66,7 +81,7 @@ func runSearch(cmd *cobra.Command, args []string) error {
 	matches := fuzzy.Find(query, contents)
 
 	if len(matches) == 0 {
-		fmt.Printf("No results for %q\n", query)
+		color.Yellow("No results for %q\n", query)
 		return nil
 	}
 
@@ -75,14 +90,38 @@ func runSearch(cmd *cobra.Command, args []string) error {
 		matches = matches[:searchLimit]
 	}
 
-	fmt.Printf("%-5s  %-12s  %s\n", "INDEX", "TIME", "PREVIEW")
+	if searchJSON {
+		out := make([]searchClipJSON, len(matches))
+		for i, m := range matches {
+			clip := clips[m.Index]
+			out[i] = searchClipJSON{
+				Index:     m.Index + 1,
+				Timestamp: clip.Timestamp.UTC().Format(time.RFC3339),
+				Content:   clip.Content,
+				Score:     m.Score,
+			}
+		}
+		enc := json.NewEncoder(cmd.OutOrStdout())
+		enc.SetIndent("", "  ")
+		return enc.Encode(out)
+	}
+
+	header := color.New(color.Bold)
+	indexColor := color.New(color.FgCyan, color.Bold)
+	timeColor := color.New(color.FgYellow)
+
+	header.Printf("%-5s  %-12s  %s\n", "INDEX", "TIME", "PREVIEW")
 	fmt.Printf("%-5s  %-12s  %s\n", "-----", "------------", strings.Repeat("-", 40))
 
 	for _, m := range matches {
 		clip := clips[m.Index]
 		relTime := relativeTime(clip.Timestamp)
 		preview := highlightMatches(truncate(singleLine(clip.Content), 80), m.MatchedIndexes)
-		fmt.Printf("%-5d  %-12s  %s\n", m.Index+1, relTime, preview)
+		fmt.Printf("%s  %s  %s\n",
+			indexColor.Sprintf("%-5d", m.Index+1),
+			timeColor.Sprintf("%-12s", relTime),
+			preview,
+		)
 	}
 
 	return nil
@@ -98,8 +137,9 @@ func singleLine(s string) string {
 
 // highlightMatches wraps matched character positions with ANSI color codes.
 // matchedIndexes must be in ascending order (as returned by the fuzzy library).
+// When color output is disabled (--no-color or NO_COLOR env), returns s unchanged.
 func highlightMatches(s string, matchedIndexes []int) string {
-	if len(matchedIndexes) == 0 {
+	if len(matchedIndexes) == 0 || color.NoColor {
 		return s
 	}
 
