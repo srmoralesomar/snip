@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/omarmorales/snip/internal/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var rootCmd = &cobra.Command{
@@ -23,4 +25,10 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+// loadConfig returns the effective configuration, merging defaults,
+// ~/.snip/config.yaml, and any viper values already bound to flags.
+func loadConfig() (*config.Config, error) {
+	return config.Load(viper.GetViper())
 }

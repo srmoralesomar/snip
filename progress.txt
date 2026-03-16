@@ -97,3 +97,15 @@ Files changed: cmd/search.go, cmd/search_test.go, prd.json, progress.txt
 - Tests: TestClear (store), TestClearCmd_Force, TestClearCmd_AbortOnNo, TestDeleteCmd_* (cmd package)
 - Note: had to reset clearForce=false in abort test due to cobra reusing flag state between test runs
 - Files changed: internal/store/store.go, internal/store/store_test.go, cmd/clear.go, cmd/clear_test.go, cmd/delete.go, cmd/delete_test.go
+
+## Task 9: Configuration file support — DONE
+
+- Created internal/config/config.go: Config struct (MaxHistory, PollIntervalMs, StoragePath), Load(v *viper.Viper) merges defaults → config file → caller-set viper values.
+- DefaultStoragePath() and DefaultConfigPath() helpers.
+- Missing config.yaml is silently ignored (ConfigFileNotFoundError); sensible defaults (max_history=500, poll_interval_ms=500, storage_path=~/.snip/history.db).
+- Created cmd/config_cmd.go: `snip config` prints current effective max_history, poll_interval_ms, storage_path.
+- Updated cmd/root.go: added loadConfig() helper that passes viper.GetViper() to config.Load().
+- Updated cmd/daemon.go: binds --max-history, --poll-interval-ms, --storage-path flags to viper keys via BindPFlag; reads effective config then respects .Changed to apply per-invocation overrides.
+- 4 unit tests in internal/config/config_test.go: defaults, from-file, flag-overrides-file, missing-file-uses-defaults — all pass.
+
+Files changed: internal/config/config.go, internal/config/config_test.go, cmd/config_cmd.go, cmd/root.go, cmd/daemon.go, prd.json, progress.txt

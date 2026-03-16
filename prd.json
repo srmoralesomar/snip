@@ -110,7 +110,7 @@
         "Missing config file uses sensible defaults",
         "Unit tests for config loading pass"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 10,
