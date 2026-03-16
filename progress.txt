@@ -143,3 +143,15 @@ Files changed: internal/pidfile/pidfile.go, internal/pidfile/pidfile_test.go, cm
 - cmd/daemon.go: green started, yellow stopped, red errors
 - cmd/status.go: green running, yellow not running
 - cmd/stop.go: green/yellow messages
+
+## Task 12: README and final polish — DONE
+
+- Added `Version = "1.0.0"` constant to cmd/root.go; set `Version` field on rootCmd so cobra generates `--version` flag automatically (`snip version 1.0.0`)
+- Wrote README.md: project description, `go install` instructions, build-from-source, quick start, all command docs with examples and flags, config.yaml reference, file layout, architecture table, dependency table
+- Added cmd/list_json_test.go: TestRunList_Empty, TestRunList_WithClips, TestRunList_CountFlag, TestRunList_JSON
+- Added cmd/search_cmd_test.go: TestRunSearch_Empty, TestRunSearch_NoMatch, TestRunSearch_WithMatches, TestRunSearch_JSON, TestRunSearch_LimitFlag
+- Added cmd/config_test.go: TestRunConfig, TestFormatUptime
+- Coverage results: cmd 62.9%, clipboard 87.5%, config 66.7%, pidfile 69.2%, store 83.7% — all above 60%
+- go vet ./... passes clean; go build succeeds
+
+Files changed: cmd/root.go, README.md, cmd/list_json_test.go, cmd/search_cmd_test.go, cmd/config_test.go, prd.json, progress.txt

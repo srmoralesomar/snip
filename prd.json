@@ -148,7 +148,7 @@
         "go build succeeds with no warnings",
         "go vet passes clean"
       ],
-      "done": false
+      "done": true
     }
   ]
 }
