@@ -14,13 +14,13 @@ A lightweight CLI clipboard history manager. Run a background daemon that silent
 ## Installation
 
 ```bash
-go install github.com/omarmorales/snip@latest
+go install github.com/srmoralesomar/snip@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/omarmorales/snip
+git clone https://github.com/srmoralesomar/snip
 cd snip
 go build -o snip .
 # Move to a directory on your PATH, e.g.:

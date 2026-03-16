@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/omarmorales/snip/internal/store"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 func TestClearCmd_Force(t *testing.T) {

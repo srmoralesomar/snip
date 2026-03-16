@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/omarmorales/snip/internal/store"
 	"github.com/sahilm/fuzzy"
 	"github.com/spf13/cobra"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 const (

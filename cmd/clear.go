@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 var clearForce bool

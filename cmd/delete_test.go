@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/omarmorales/snip/internal/store"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 func makeTestStore(t *testing.T, clips ...string) string {

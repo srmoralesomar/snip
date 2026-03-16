@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/omarmorales/snip/internal/config"
 	"github.com/spf13/viper"
+	"github.com/srmoralesomar/snip/internal/config"
 )
 
 func newViper() *viper.Viper {

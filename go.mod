@@ -1,4 +1,4 @@
-module github.com/omarmorales/snip
+module github.com/srmoralesomar/snip
 
 go 1.23.0
 

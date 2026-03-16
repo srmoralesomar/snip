@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/omarmorales/snip/internal/store"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 func TestCopyCmd_InvalidIndex(t *testing.T) {

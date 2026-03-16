@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/omarmorales/snip/internal/clipboard"
-	"github.com/omarmorales/snip/internal/pidfile"
-	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/srmoralesomar/snip/internal/clipboard"
+	"github.com/srmoralesomar/snip/internal/pidfile"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 var daemonCmd = &cobra.Command{

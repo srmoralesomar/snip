@@ -5,16 +5,16 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/omarmorales/snip/internal/store"
 	"github.com/spf13/cobra"
+	"github.com/srmoralesomar/snip/internal/store"
 )
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete <index>",
 	Short: "Remove a clip from history",
-	Long: `Remove a single clip from history by its index (as shown by 'snip list').`,
-	Args: cobra.ExactArgs(1),
-	RunE: runDelete,
+	Long:  `Remove a single clip from history by its index (as shown by 'snip list').`,
+	Args:  cobra.ExactArgs(1),
+	RunE:  runDelete,
 }
 
 func init() {

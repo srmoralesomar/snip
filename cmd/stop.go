@@ -7,8 +7,8 @@ import (
 	"syscall"
 
 	"github.com/fatih/color"
-	"github.com/omarmorales/snip/internal/pidfile"
 	"github.com/spf13/cobra"
+	"github.com/srmoralesomar/snip/internal/pidfile"
 )
 
 var stopCmd = &cobra.Command{
