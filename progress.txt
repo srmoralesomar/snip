@@ -50,3 +50,16 @@ Files changed: internal/store/store.go, internal/store/store_test.go
 - All existing tests pass; go build succeeds.
 
 Files changed: cmd/daemon.go
+
+---
+
+## Task 5: snip list command — DONE
+
+- Implemented cmd/list.go: `snip list` shows up to N recent clips (default 20, --count/-n flag).
+- Output table: INDEX, TIME (relative), PREVIEW (content truncated to 80 chars with "…").
+- truncate(): replaces newlines/tabs/CR with spaces for single-line preview; handles unicode via utf8.RuneCountInString.
+- relativeTime(): formats duration as "just now", Xs ago, Xm ago, Xh ago, Xd ago.
+- Empty history shows a friendly message.
+- Unit tests for truncate (7 cases) and relativeTime (8 cases) in cmd/list_test.go — all pass.
+
+Files changed: cmd/list.go, cmd/list_test.go, prd.json, progress.txt

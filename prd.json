@@ -60,7 +60,7 @@
         "--count flag limits output",
         "Empty history shows a friendly message"
       ],
-      "done": false
+      "done": true
     },
     {
       "id": 6,
