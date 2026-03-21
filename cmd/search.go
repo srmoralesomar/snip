@@ -57,7 +57,7 @@ func runSearch(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip start' to start recording clipboard history", err)
 	}
 	defer s.Close()
 
@@ -68,7 +68,7 @@ func runSearch(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(clips) == 0 {
-		color.Yellow("No clipboard history yet. Start the daemon and copy something!")
+		color.Yellow("No clipboard history yet. Run snip start and copy something!")
 		return nil
 	}
 

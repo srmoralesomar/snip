@@ -21,8 +21,8 @@ var rootCmd = &cobra.Command{
 	Version: Version,
 	Long: `snip is a lightweight clipboard history manager.
 
-It runs a background daemon that watches your clipboard and stores
-every copied item in a local database (~/.snip/history.db).
+With snip start, a long-running clipboard watcher stores every copied
+item in a local database (~/.snip/history.db).
 Use the CLI commands to search, recall, and paste any entry.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if noColor {

@@ -1,10 +1,10 @@
 # snip — Clipboard History Manager
 
-A lightweight CLI clipboard history manager. Run a background daemon that silently watches your clipboard and stores every copied item in a local database. Search, recall, and paste any entry from the terminal.
+A lightweight CLI clipboard history manager. Use `snip start` to run a long-running clipboard watcher that stores every copied item in a local database. Search, recall, and paste any entry from the terminal.
 
 ## Features
 
-- Background daemon with automatic deduplication
+- Clipboard watcher with automatic deduplication (`snip start`)
 - Fuzzy search with highlighted matches
 - JSON output for scripting
 - Configurable via `~/.snip/config.yaml`
@@ -45,8 +45,10 @@ mv snip /usr/local/bin/
 ## Quick Start
 
 ```bash
-# Start the daemon (runs in the background, suppressing output)
-snip daemon > /dev/null 2>&1 &
+# Start the watcher in the shell background (suppresses output). 
+snip start > /dev/null 2>&1 &
+# Closing the terminal may stop it; 
+# use nohup, disown, tmux, or a user LaunchAgent/systemd unit if you need it to survive the terminal closing.
 
 # Copy something to your clipboard, then list history
 snip list
@@ -57,21 +59,21 @@ snip search "hello"
 # Copy a clip back to your clipboard
 snip copy 3
 
-# Stop the daemon
+# Stop the watcher
 snip stop
 ```
 
 ## Commands
 
-### `snip daemon`
+### `snip start`
 
-Start the clipboard watcher daemon. It polls the clipboard every 500 ms (configurable) and saves new entries to `~/.snip/history.db`.
+Start the long-running clipboard watcher. It polls the clipboard every 500 ms (configurable) and saves new entries to `~/.snip/history.db`. Press Ctrl+C or run `snip stop` to exit.
 
 ```bash
-snip daemon
-snip daemon --max-history 1000     # Keep up to 1000 entries
-snip daemon --poll-interval-ms 250 # Poll every 250ms
-snip daemon --storage-path /tmp/snip.db
+snip start
+snip start --max-history 1000     # Keep up to 1000 entries
+snip start --poll-interval-ms 250 # Poll every 250ms
+snip start --storage-path /tmp/snip.db
 ```
 
 ### `snip list`
@@ -132,7 +134,7 @@ snip clear --force   # Skip confirmation
 
 ### `snip status`
 
-Show whether the daemon is running, along with its PID, uptime, and total clip count.
+Show whether the clipboard watcher is running, along with its PID, uptime, and total clip count.
 
 ```bash
 snip status
@@ -141,7 +143,7 @@ snip status
 Example output:
 
 ```
-daemon: running
+watcher: running
   PID:    12345
   uptime: 2h 15m 3s
   clips:  142
@@ -149,7 +151,7 @@ daemon: running
 
 ### `snip stop`
 
-Send SIGTERM to the running daemon.
+Send SIGTERM to the running snip process (started with `snip start`).
 
 ```bash
 snip stop
@@ -189,7 +191,7 @@ CLI flags always override config file values. Missing config file silently uses 
 ~/.snip/
 ├── history.db    # BoltDB database of clipboard entries
 ├── config.yaml   # Optional configuration file
-└── daemon.pid    # PID file written while daemon is running
+└── snip.pid      # PID file written while snip start is running
 ```
 
 ## Architecture
@@ -199,7 +201,7 @@ snip/
 ├── main.go                        # Entry point — calls cmd.Execute()
 ├── cmd/                           # Cobra CLI commands
 │   ├── root.go                    # Root command, --no-color flag, loadConfig()
-│   ├── daemon.go                  # snip daemon — watcher + storage loop
+│   ├── start.go                   # snip start — watcher + storage loop
 │   ├── list.go                    # snip list
 │   ├── search.go                  # snip search (fuzzy)
 │   ├── copy.go                    # snip copy

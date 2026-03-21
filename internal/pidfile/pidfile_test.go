@@ -37,7 +37,7 @@ func TestWriteCreatesParentDir(t *testing.T) {
 }
 
 func TestReadNotExist(t *testing.T) {
-	_, err := Read("/nonexistent/path/daemon.pid")
+	_, err := Read("/nonexistent/path/snip.pid")
 	if err == nil {
 		t.Fatal("expected error reading nonexistent file")
 	}
@@ -65,7 +65,7 @@ func TestRemove(t *testing.T) {
 
 func TestRemoveNotExist(t *testing.T) {
 	// Should not return an error when file doesn't exist.
-	if err := Remove("/nonexistent/daemon.pid"); err != nil {
+	if err := Remove("/nonexistent/snip.pid"); err != nil {
 		t.Errorf("Remove on nonexistent file: %v", err)
 	}
 }

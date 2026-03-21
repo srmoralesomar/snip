@@ -35,7 +35,7 @@ func runClear(cmd *cobra.Command, args []string) error {
 
 	s, err := store.New(dbPath)
 	if err != nil {
-		return fmt.Errorf("open history database: %w\nHint: run 'snip daemon' to start recording clipboard history", err)
+		return fmt.Errorf("open history database: %w\nHint: run 'snip start' to start recording clipboard history", err)
 	}
 	defer s.Close()
 

@@ -13,8 +13,8 @@ import (
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop the running daemon",
-	Long:  `Send SIGTERM to the running snip daemon to shut it down cleanly.`,
+	Short: "Stop the clipboard watcher",
+	Long:  `Send SIGTERM to the running snip process (started with snip start) to shut it down cleanly.`,
 	RunE:  runStop,
 }
 
@@ -30,7 +30,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 
 	pid, err := pidfile.Read(pidPath)
 	if errors.Is(err, os.ErrNotExist) {
-		color.New(color.FgYellow).Fprintln(os.Stderr, "daemon is not running")
+		color.New(color.FgYellow).Fprintln(os.Stderr, "snip is not running")
 		return nil
 	}
 	if err != nil {
@@ -38,7 +38,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 	}
 
 	if !pidfile.IsRunning(pid) {
-		color.New(color.FgYellow).Fprintln(os.Stderr, "daemon is not running (stale pid file removed)")
+		color.New(color.FgYellow).Fprintln(os.Stderr, "snip is not running (stale pid file removed)")
 		_ = pidfile.Remove(pidPath)
 		return nil
 	}
@@ -51,6 +51,6 @@ func runStop(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("send SIGTERM to pid %d: %w", pid, err)
 	}
 
-	color.New(color.FgGreen).Fprintf(os.Stderr, "sent SIGTERM to daemon (PID %d)\n", pid)
+	color.New(color.FgGreen).Fprintf(os.Stderr, "sent SIGTERM (PID %d)\n", pid)
 	return nil
 }

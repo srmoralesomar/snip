@@ -11,13 +11,14 @@ import (
 	"time"
 )
 
-// DefaultPath returns the default path for the daemon PID file (~/.snip/daemon.pid).
+// DefaultPath returns the default path for the snip PID file (~/.snip/snip.pid),
+// written while `snip start` is running.
 func DefaultPath() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("resolve home dir: %w", err)
 	}
-	return filepath.Join(home, ".snip", "daemon.pid"), nil
+	return filepath.Join(home, ".snip", "snip.pid"), nil
 }
 
 // Write writes pid to the file at path, creating the parent directory if needed.
@@ -62,7 +63,7 @@ func IsRunning(pid int) bool {
 }
 
 // StartTime returns the modification time of the PID file, used as a proxy
-// for when the daemon was started.
+// for when the watcher was started.
 func StartTime(path string) (time.Time, error) {
 	info, err := os.Stat(path)
 	if err != nil {

@@ -14,8 +14,8 @@ import (
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "Show daemon status",
-	Long:  `Show whether the snip daemon is running, along with its PID, uptime, and clip count.`,
+	Short: "Show watcher status",
+	Long:  `Show whether the clipboard watcher is running, along with its PID, uptime, and clip count.`,
 	RunE:  runStatus,
 }
 
@@ -31,7 +31,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 
 	pid, err := pidfile.Read(pidPath)
 	if errors.Is(err, os.ErrNotExist) || (err == nil && !pidfile.IsRunning(pid)) {
-		color.New(color.FgYellow).Println("daemon: not running")
+		color.New(color.FgYellow).Println("watcher: not running")
 		if err == nil {
 			// Stale PID file — clean it up silently.
 			_ = pidfile.Remove(pidPath)
@@ -49,7 +49,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	bold := color.New(color.Bold)
-	bold.Print("daemon: ")
+	bold.Print("watcher: ")
 	color.New(color.FgGreen).Println("running")
 	fmt.Printf("  PID:    %d\n", pid)
 	fmt.Printf("  uptime: %s\n", uptime)
